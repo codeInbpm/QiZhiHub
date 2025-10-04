@@ -17,12 +17,6 @@
 
 PIG 提供了详尽的部署文档 👉 [wiki.pig4cloud.com](https://wiki.pig4cloud.com)，涵盖开发环境配置、服务端启动、前端运行等关键步骤。
 
-重要的事情说三遍：
-
-- 🔥 [ 配套文档 wiki.pig4cloud.com](https://wiki.pig4cloud.com)
-- 🔥 [ 配套文档 wiki.pig4cloud.com](https://wiki.pig4cloud.com)
-- 🔥 [ 配套文档 wiki.pig4cloud.com](https://wiki.pig4cloud.com)
-
 #### 其他产品
 
 - 👉🏻 [PIGX 在线体验](http://home.pig4cloud.com:38081)
@@ -31,20 +25,6 @@ PIG 提供了详尽的部署文档 👉 [wiki.pig4cloud.com](https://wiki.pig4cl
 
 - 👉🏻 [大模型 RAG 知识库](http://home.pig4cloud.com:38083)
 
-## 微信群 [禁广告]
-
-<img src='https://minio.pigx.vip/oss/202412/1735262426.png' alt='1735262426'/>
-
-## 快速开始
-
-#### Docker 快速体验
-
-```shell
-# 可用内存大于4G
-curl -o docker-compose.yaml https://try.pig4cloud.com
-# 等待5分钟
-docker compose up
-```
 
 ### 核心依赖
 
@@ -90,47 +70,6 @@ pig
      └── pig-quartz -- 定时任务管理台 [5007]
 ```
 
-## 免费公开课
-
-<table>
-  <tr>
-    <td><a href="https://www.bilibili.com/video/av45084065" target="_blank"><img src="https://foruda.gitee.com/images/1731647304254897555/88a9c2fa_441246.jpeg"></a></td>
-    <td><a href="https://www.bilibili.com/video/av77344954" target="_blank"><img src="https://foruda.gitee.com/images/1731647324953921510/39689640_441246.jpeg"></a></td>
-  </tr>
-    <tr>
-    <td><a href="https://www.bilibili.com/video/BV1J5411476V" target="_blank"><img src="https://foruda.gitee.com/images/1731647357502030768/7f31f392_441246.jpeg"></a></td>
-    <td><a href="https://www.bilibili.com/video/BV14p4y197K5" target="_blank"><img src="https://foruda.gitee.com/images/1731647375444479120/2b8fd494_441246.jpeg"></a></td>
-  </tr>
-</table>
-
-## 开源共建
-
-### 开源协议
-
-pig 开源软件遵循 [Apache 2.0 协议](https://www.apache.org/licenses/LICENSE-2.0.html)。
-允许商业使用，但务必保留类作者、Copyright 信息。
-
-![](https://foruda.gitee.com/images/1731647419204307063/91217172_441246.jpeg)
-
-### 其他说明
-
-1. 欢迎提交 [PR](https://dwz.cn/2KURd5Vf)，注意对应提交对应 `dev` 分支
-   代码规范 [spring-javaformat](https://github.com/spring-io/spring-javaformat)
-
-   <details>
-    <summary>代码规范说明</summary>
-
-    1. 由于 <a href="https://github.com/spring-io/spring-javaformat" target="_blank">spring-javaformat</a>
-       强制所有代码按照指定格式排版，未按此要求提交的代码将不能通过合并（打包）
-    2. 如果使用 IntelliJ IDEA
-       开发，请安装自动格式化软件 <a href="https://repo1.maven.org/maven2/io/spring/javaformat/spring-javaformat-intellij-idea-plugin/" target="_blank">
-       spring-javaformat-intellij-idea-plugin</a>
-    3. 其他开发工具，请参考 <a href="https://github.com/spring-io/spring-javaformat" target="_blank">
-       spring-javaformat</a>
-       说明，或`提交代码前`在项目根目录运行下列命令（需要开发者电脑支持`mvn`命令）进行代码格式化
-       ```
-       mvn spring-javaformat:apply
-       ```
-   </details>
-
-2. 欢迎提交 [issue](https://gitee.com/log4j/pig/issues)，请写清楚遇到问题的原因、开发环境、复显步骤。
+基于PIG开发一个 协同管理平台
+demo：http://www.rockoa.com/view_demo.html
+      http://demo.rockoa.com/?m=login
