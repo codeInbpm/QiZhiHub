@@ -1,3 +1,6 @@
+企智汇   
+Hive 寓意蜂巢式汇聚（多模块协作），Zhi 加智慧。
+
 <p align="center">
  <img src="https://img.shields.io/badge/Pig-3.9-success.svg" alt="Build Status">
  <img src="https://img.shields.io/badge/Spring%20Cloud-2025-blue.svg" alt="Coverage Status">
