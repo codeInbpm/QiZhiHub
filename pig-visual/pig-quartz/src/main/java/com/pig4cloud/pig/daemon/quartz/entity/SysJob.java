@@ -50,7 +50,7 @@ public class SysJob extends Model<SysJob> {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 任务id
+	 * 任务id a
 	 */
 	@TableId(value = "job_id", type = IdType.ASSIGN_ID)
 	private Long jobId;
