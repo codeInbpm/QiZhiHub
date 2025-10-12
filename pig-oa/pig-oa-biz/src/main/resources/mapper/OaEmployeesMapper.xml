@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pig4cloud.pig.oa.mapper.OaEmployeesMapper">
+
+  <resultMap id="oaEmployeesMap" type="com.pig4cloud.pig.oa.entity.OaEmployeesEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="employeeNo" column="employee_no"/>
+        <result property="enpName" column="enp_name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="gender" column="gender"/>
+        <result property="departmentId" column="department_id"/>
+        <result property="position" column="position"/>
+        <result property="postId" column="post_id"/>
+        <result property="empStatus" column="emp_status"/>
+        <result property="passwordExpireDate" column="password_expire_date"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="hireType" column="hire_type"/>
+        <result property="empType" column="emp_type"/>
+        <result property="entryDate" column="entry_date"/>
+        <result property="probationEndDate" column="probation_end_date"/>
+        <result property="regularizationDate" column="regularization_date"/>
+        <result property="exitDate" column="exit_date"/>
+        <result property="education" column="education"/>
+        <result property="ethnicity" column="ethnicity"/>
+        <result property="birthdayType" column="birthday_type"/>
+        <result property="birthday" column="birthday"/>
+        <result property="nativePlace" column="native_place"/>
+        <result property="maritalStatus" column="marital_status"/>
+        <result property="idCard" column="id_card"/>
+        <result property="currentAddress" column="current_address"/>
+        <result property="familyAddress" column="family_address"/>
+        <result property="landlinePhone" column="landline_phone"/>
+        <result property="mobilePhone" column="mobile_phone"/>
+        <result property="email" column="email"/>
+        <result property="emergencyContact" column="emergency_contact"/>
+        <result property="emergencyPhone" column="emergency_phone"/>
+        <result property="bankName" column="bank_name"/>
+        <result property="bankAccount" column="bank_account"/>
+        <result property="remarks" column="remarks"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="tenantId" column="tenant_id"/>
+  </resultMap>
+</mapper>
