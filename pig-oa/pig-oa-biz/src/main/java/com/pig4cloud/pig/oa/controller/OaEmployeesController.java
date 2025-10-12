@@ -2,9 +2,11 @@ package com.pig4cloud.pig.oa.controller;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pig4cloud.pig.admin.api.entity.SysFile;
 import com.pig4cloud.pig.oa.entity.OaEmployeesEntity;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
@@ -49,8 +51,10 @@ public class OaEmployeesController {
     @GetMapping("/page" )
     @HasPermission("oa_oaEmployees_view")
     public R getOaEmployeesPage(@ParameterObject Page page, @ParameterObject OaEmployeesEntity oaEmployees) {
-        LambdaQueryWrapper<OaEmployeesEntity> wrapper = Wrappers.lambdaQuery();
-        return R.ok(oaEmployeesService.page(page, wrapper));
+        LambdaQueryWrapper<OaEmployeesEntity> wrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
+				.like(StrUtil.isNotBlank(oaEmployees.getEmployeeNo()), OaEmployeesEntity::getEmployeeNo, oaEmployees.getEmployeeNo());
+
+		return R.ok(oaEmployeesService.page(page, wrapper));
     }
 
 
