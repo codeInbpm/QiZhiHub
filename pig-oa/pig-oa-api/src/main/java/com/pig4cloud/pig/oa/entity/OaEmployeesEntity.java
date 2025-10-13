@@ -26,7 +26,7 @@ public class OaEmployeesEntity extends Model<OaEmployeesEntity> {
 	*/
     @TableId(type = IdType.ASSIGN_ID)
     @Schema(description="员工ID")
-    private Integer id;
+    private Long id;
 
 	/**
 	* 关联系统用户ID（sys_user.user_id）

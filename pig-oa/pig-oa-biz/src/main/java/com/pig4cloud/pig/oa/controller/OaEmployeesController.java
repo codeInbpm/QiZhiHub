@@ -10,6 +10,7 @@ import com.pig4cloud.pig.admin.api.entity.SysFile;
 import com.pig4cloud.pig.oa.entity.OaEmployeesEntity;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
+import com.pig4cloud.pig.oa.vo.OaEmployeesVO;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.pig.oa.service.OaEmployeesService;
@@ -131,7 +132,7 @@ public class OaEmployeesController {
      */
     @PostMapping("/import")
     @HasPermission("oa_oaEmployees_export")
-    public R importExcel(@RequestExcel List<OaEmployeesEntity> oaEmployeesList, BindingResult bindingResult) {
-        return R.ok(oaEmployeesService.saveBatch(oaEmployeesList));
+    public R importExcel(@RequestExcel List<OaEmployeesVO> oaEmployeesList, BindingResult bindingResult) {
+        return R.ok(oaEmployeesService.importEmployees(oaEmployeesList,bindingResult));
     }
 }
