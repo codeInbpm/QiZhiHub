@@ -27,6 +27,7 @@ import com.pig4cloud.pig.common.core.util.R;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门管理服务接口
@@ -70,5 +71,8 @@ public interface SysDeptService extends IService<SysDept> {
 	 * @return 后代部门列表，如果不存在则返回空列表
 	 */
 	List<SysDept> listDescendants(Long deptId);
+
+	Map<Long, String> getDeptNamesByIds(List<Long> deptIds);
+
 
 }

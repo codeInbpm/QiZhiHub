@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -218,5 +220,13 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
 			recursiveDept(allDeptList, sysDept.getDeptId(), resDeptList);
 		});
 	}
+	@Override
+	public Map<Long, String> getDeptNamesByIds(List<Long> deptIds) {
+		// 查询部门表中所有部门名称
+		List<SysDept> deptList = this.list(new LambdaQueryWrapper<SysDept>().in(SysDept::getDeptId, deptIds));
 
+		// 转换为Map，键是dept_id，值是部门名称
+		return deptList.stream()
+				.collect(Collectors.toMap(SysDept::getDeptId, SysDept::getName));
+	}
 }

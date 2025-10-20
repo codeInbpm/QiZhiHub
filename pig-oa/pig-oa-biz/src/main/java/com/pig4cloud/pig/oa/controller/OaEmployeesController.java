@@ -4,9 +4,9 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.pig4cloud.pig.admin.api.entity.SysFile;
 import com.pig4cloud.pig.oa.entity.OaEmployeesEntity;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
@@ -25,7 +25,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * OA员工档案主表
@@ -48,15 +52,39 @@ public class OaEmployeesController {
      * @param oaEmployees OA员工档案主表
      * @return
      */
-    @Operation(summary = "分页查询" , description = "分页查询" )
-    @GetMapping("/page" )
-    @HasPermission("oa_oaEmployees_view")
-    public R getOaEmployeesPage(@ParameterObject Page page, @ParameterObject OaEmployeesEntity oaEmployees) {
-        LambdaQueryWrapper<OaEmployeesEntity> wrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
+	@Operation(summary = "分页查询" , description = "分页查询" )
+	@GetMapping("/page" )
+	@HasPermission("oa_oaEmployees_view")
+	public R getOaEmployeesPage(@ParameterObject Page page, @ParameterObject OaEmployeesEntity oaEmployees) {
+		// 查询员工列表
+		LambdaQueryWrapper<OaEmployeesEntity> wrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
 				.like(StrUtil.isNotBlank(oaEmployees.getEmployeeNo()), OaEmployeesEntity::getEmployeeNo, oaEmployees.getEmployeeNo());
 
-		return R.ok(oaEmployeesService.page(page, wrapper));
-    }
+		IPage<OaEmployeesEntity> employeePage = oaEmployeesService.page(page, wrapper);
+		List<OaEmployeesEntity> employees = employeePage.getRecords();
+
+		// 批量获取部门名称
+		if (CollUtil.isNotEmpty(employees)) {
+			// 收集所有唯一 deptId
+			List<Long> deptIds = employees.stream()
+					.map(OaEmployeesEntity::getDepartmentId)  // 假设有 getDepartmentId()
+					.filter(Objects::nonNull)
+					.distinct()
+					.collect(Collectors.toList());
+
+			// 一次性调用 Service（委托 Feign）
+			R<Map<Long, String>> result = oaEmployeesService.getDeptNamesByIds(deptIds);
+			Map<Long, String> deptNameMap = (result != null && result.getData() != null) ? result.getData() : new HashMap<>();
+
+			// 批量设置
+			employees.forEach(employee -> {
+				Long deptId = employee.getDepartmentId();
+				employee.setDeptName((deptId != null) ? deptNameMap.get(deptId) : null);
+			});
+		}
+
+		return R.ok(employeePage.setRecords(employees));
+	}
 
 
     /**

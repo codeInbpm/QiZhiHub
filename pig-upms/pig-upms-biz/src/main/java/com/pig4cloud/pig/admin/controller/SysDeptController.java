@@ -22,9 +22,11 @@ package com.pig4cloud.pig.admin.controller;
 import com.pig4cloud.pig.admin.api.entity.SysDept;
 import com.pig4cloud.pig.admin.api.vo.DeptExcelVo;
 import com.pig4cloud.pig.admin.service.SysDeptService;
+import com.pig4cloud.pig.common.core.constant.CacheConstants;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
+import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,12 +34,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门管理前端控制器
@@ -160,4 +164,11 @@ public class SysDeptController {
 		return sysDeptService.importDept(excelVOList, bindingResult);
 	}
 
+	@Inner
+	@GetMapping("/remote/names/{ids}")
+	@Operation(summary = "通过id获取部门名称(针对feign调用)", description = "通过id获取部门名称(针对feign调用)", hidden = true)
+	@Cacheable(value = CacheConstants.DICT_DETAILS, key = "'deptNames:' + T(org.apache.commons.lang3.StringUtils).join(#ids, ',')", unless = "#result.data.isEmpty()")
+	public R<Map<Long, String>> getDeptNamesByIds(@RequestParam("ids") List<Long> ids) {
+		return R.ok(sysDeptService.getDeptNamesByIds(ids));
+	}
 }

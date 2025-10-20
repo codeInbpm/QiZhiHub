@@ -64,6 +64,11 @@ public class OaEmployeesEntity extends Model<OaEmployeesEntity> {
     @Schema(description="所属部门ID（sys_dept.dept_id）")
     private Long departmentId;
 
+	// 部门名称
+	@TableField(exist = false)
+	@Schema(description = "部门名称")
+	private String deptName;
+
 	/**
 	* 职位
 	*/

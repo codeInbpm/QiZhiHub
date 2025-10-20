@@ -1,51 +1,44 @@
 package com.pig4cloud.pig.oa.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pig4cloud.pig.admin.api.entity.SysDept;
 import com.pig4cloud.pig.admin.api.feign.RemoteDeptService;
-import com.pig4cloud.pig.admin.service.SysDeptService; // 假设保留
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
-import com.pig4cloud.pig.common.core.exception.ErrorCodes; // 假设保留
 import com.pig4cloud.pig.common.core.util.MsgUtils;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.oa.constant.OaErrorConstants;
-import com.pig4cloud.plugin.excel.vo.ErrorMessage;
-import com.pig4cloud.pig.admin.api.entity.SysDept;
 import com.pig4cloud.pig.oa.entity.OaEmployeesEntity;
 import com.pig4cloud.pig.oa.mapper.OaEmployeesMapper;
 import com.pig4cloud.pig.oa.service.OaEmployeesService;
 import com.pig4cloud.pig.oa.vo.OaEmployeesVO;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.pig4cloud.plugin.excel.vo.ErrorMessage;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * OA员工档案主表实现
+ * OA员工档案主表
  *
  * @author wangben
  * @date 2025-10-12 21:59:38
  */
-@Slf4j
 @Service
-@AllArgsConstructor
-public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmployeesEntity>
-		implements OaEmployeesService {
+public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmployeesEntity> implements OaEmployeesService {
+
+	@Autowired
+	private RemoteDeptService remoteDeptService;
 
 	// 远程部门服务
-	private final RemoteDeptService remoteDeptService;
 	private final ObjectMapper objectMapper;
 
 	// 用于校验字典值的常量
@@ -53,6 +46,18 @@ public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmp
 	private static final Set<String> HIRE_TYPE_SET = Set.of("全职", "兼职", "远程"); // 示例值
 	private static final Set<String> EMP_TYPE_SET = Set.of("正式", "合同", "实习"); // 示例值
 
+	public OaEmployeesServiceImpl(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+
+	@Override
+	public R<Map<Long, String>> getDeptNamesByIds(List<Long> deptIds) {
+		// 直接委托 Feign 调用，如果 deptIds 为空，返回空 Map
+		if (deptIds == null || deptIds.isEmpty()) {
+			return R.ok(Map.of());
+		}
+		return remoteDeptService.getDeptNamesByIds(deptIds);
+	}
 	// 完善 getAllDepts() 方法
 	private List<SysDept> getAllDepts() {
 		// 调用远程服务获取部门列表
@@ -66,14 +71,14 @@ public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmp
 				try {
 					return objectMapper.convertValue(data, new TypeReference<List<SysDept>>() {});
 				} catch (IllegalArgumentException e) {
-					log.error("远程部门列表数据类型转换失败: {}", e.getMessage());
+					log.error("远程部门列表数据类型转换失败: {}");
 					return Collections.emptyList();
 				}
 			}
 		}
 
 		// 如果调用失败或者返回数据为空/类型不正确
-		log.error("调用远程部门服务获取部门列表失败或数据为空: {}", result != null ? result.getMsg() : "远程调用返回空");
+		log.error("调用远程部门服务获取部门列表失败或数据为空: {}");
 		return Collections.emptyList();
 	}
 
