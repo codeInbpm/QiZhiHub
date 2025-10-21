@@ -67,6 +67,24 @@ pig
 └── pig-upms -- 通用用户权限管理模块
      └── pig-upms-api -- 通用用户权限管理系统公共api模块
      └── pig-upms-biz -- 通用用户权限管理系统业务处理模块[4000]
+└── pig-oa -- 人事考勤管理模块
+     └── pig-oa-api -- 人事考勤管理系统公共api模块
+     └── pig-oa-biz -- 人事考勤管理系统业务处理模块[5008]
+└── pig-pmo -- 项目管理模块
+     └── pig-pmo-api -- 项目管理系统公共api模块
+     └── pig-pmo-biz -- 项目管理系统业务处理模块[5009]
+└── pig-finance -- 财务管理模块
+     └── pig-finance-api -- 财务管理系统公共api模块
+     └── pig-finance-biz -- 财务管理系统业务处理模块[5010]
+└── pig-process -- 流程管理模块
+     └── pig-process-api -- 流程管理系统公共api模块
+     └── pig-process-biz -- 流程管理系统业务处理模块[5011]
+└── pig-erp -- 资源计划管理模块
+     └── pig-erp-api -- 资源计划管理系统公共api模块
+     └── pig-erp-biz -- 资源计划管理系统业务处理模块[5012]
+└── pig-customer -- 客户管理模块
+     └── pig-customer-api -- 客户管理系统公共api模块
+     └── pig-customer-biz -- 客户管理系统业务处理模块[5013]
 └── pig-visual
      └── pig-monitor -- 服务监控 [5001]
      ├── pig-codegen -- 图形化代码生成 [5002]
