@@ -163,4 +163,20 @@ public class OaEmployeesController {
     public R importExcel(@RequestExcel List<OaEmployeesVO> oaEmployeesList, BindingResult bindingResult) {
         return R.ok(oaEmployeesService.importEmployees(oaEmployeesList,bindingResult));
     }
+
+    /**
+     * 获取员工列表数据（用于下拉选择）
+     * @return 员工列表数据
+     */
+    @Operation(summary = "获取员工列表数据", description = "用于下拉选择")
+    @GetMapping("/list")
+    public R getEmployeeList() {
+        // 查询所有员工基本信息
+        List<OaEmployeesEntity> employees = oaEmployeesService.list(
+            Wrappers.<OaEmployeesEntity>lambdaQuery()
+                .select(OaEmployeesEntity::getId, OaEmployeesEntity::getEnpName, OaEmployeesEntity::getEmployeeNo)
+        );
+        
+        return R.ok(employees);
+    }
 }
