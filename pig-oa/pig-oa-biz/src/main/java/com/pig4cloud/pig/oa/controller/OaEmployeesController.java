@@ -166,17 +166,28 @@ public class OaEmployeesController {
 
     /**
      * 获取员工列表数据（用于下拉选择）
-     * @return 员工列表数据
+     * @param page 分页对象
+     * @param keyword 搜索关键词（支持姓名和工号模糊搜索）
+     * @return 员工列表数据（分页）
      */
-    @Operation(summary = "获取员工列表数据", description = "用于下拉选择")
+    @Operation(summary = "获取员工列表数据", description = "用于下拉选择，支持姓名和工号模糊搜索")
     @GetMapping("/list")
-    public R getEmployeeList() {
-        // 查询所有员工基本信息
-        List<OaEmployeesEntity> employees = oaEmployeesService.list(
-            Wrappers.<OaEmployeesEntity>lambdaQuery()
-                .select(OaEmployeesEntity::getId, OaEmployeesEntity::getEnpName, OaEmployeesEntity::getEmployeeNo)
-        );
+    public R getEmployeeList(@ParameterObject Page page, @RequestParam(required = false) String keyword) {
+        // 构建查询条件
+        LambdaQueryWrapper<OaEmployeesEntity> queryWrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
+            .select(OaEmployeesEntity::getId, OaEmployeesEntity::getEnpName, OaEmployeesEntity::getEmployeeNo);
+
+        if (StrUtil.isNotBlank(keyword)) {
+            queryWrapper.and(wrapper -> wrapper
+                .like(OaEmployeesEntity::getEnpName, keyword)
+                .or()
+                .like(OaEmployeesEntity::getEmployeeNo, keyword)
+            );
+        }
         
-        return R.ok(employees);
+        // 执行分页查询
+        IPage<OaEmployeesEntity> employeePage = oaEmployeesService.page(page, queryWrapper);
+        
+        return R.ok(employeePage);
     }
 }
