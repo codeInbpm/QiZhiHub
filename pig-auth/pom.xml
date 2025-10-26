@@ -83,6 +83,20 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-crypto</artifactId>
         </dependency>
+
+
+		<!-- 新增：MySQL 驱动（必需，Spring Boot 3.x 兼容） -->
+		<dependency>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>9.2.0</version>
+		</dependency>
+
+		<!-- 如果有 MyBatis，确保已引入（从 common-core 传递） -->
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+		</dependency>
     </dependencies>
 
     <profiles>
