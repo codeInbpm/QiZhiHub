@@ -2,11 +2,15 @@ package com.pig4cloud.pig.oa.controller;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
+import com.pig4cloud.pig.oa.entity.OaEmployeeCertificatesEntity;
+import com.pig4cloud.pig.oa.feign.RemoteEmployeeService;
 import com.pig4cloud.plugin.excel.annotation.ResponseExcel;
 import com.pig4cloud.plugin.excel.annotation.RequestExcel;
 import com.pig4cloud.pig.oa.entity.OaEmployeeContractsEntity;
@@ -23,7 +27,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * OA员工合同表
@@ -39,6 +45,7 @@ import java.util.Objects;
 public class OaEmployeeContractsController {
 
     private final  OaEmployeeContractsService oaEmployeeContractsService;
+	private final RemoteEmployeeService remoteEmployeeService; // Feign 服务注入
 
     /**
      * 分页查询
@@ -46,13 +53,47 @@ public class OaEmployeeContractsController {
      * @param oaEmployeeContracts OA员工合同表
      * @return
      */
-    @Operation(summary = "分页查询" , description = "分页查询" )
-    @GetMapping("/page" )
-    @HasPermission("oa_oaEmployeeContracts_view")
-    public R getOaEmployeeContractsPage(@ParameterObject Page page, @ParameterObject OaEmployeeContractsEntity oaEmployeeContracts) {
-        LambdaQueryWrapper<OaEmployeeContractsEntity> wrapper = Wrappers.lambdaQuery();
-        return R.ok(oaEmployeeContractsService.page(page, wrapper));
-    }
+	@Operation(summary = "分页查询", description = "分页查询")
+	@GetMapping("/page")
+	@HasPermission("oa_oaEmployeeContracts_view")
+	public R<IPage<OaEmployeeContractsEntity>> getOaEmployeeContractsPage(@ParameterObject Page<OaEmployeeContractsEntity> page, @ParameterObject OaEmployeeContractsEntity oaEmployeeContracts) {
+		LambdaQueryWrapper<OaEmployeeContractsEntity> wrapper = Wrappers.lambdaQuery();
+		wrapper.like(StrUtil.isNotBlank(oaEmployeeContracts.getContractNumber()), OaEmployeeContractsEntity::getContractNumber, oaEmployeeContracts.getContractNumber());
+		wrapper.like(StrUtil.isNotBlank(oaEmployeeContracts.getContractName()), OaEmployeeContractsEntity::getContractName, oaEmployeeContracts.getContractName());
+		wrapper.like(StrUtil.isNotBlank(oaEmployeeContracts.getContractType()), OaEmployeeContractsEntity::getContractType, oaEmployeeContracts.getContractType());
+		wrapper.eq(Objects.nonNull(oaEmployeeContracts.getContractStatus()), OaEmployeeContractsEntity::getContractStatus, oaEmployeeContracts.getContractStatus());
+
+		IPage<OaEmployeeContractsEntity> result = oaEmployeeContractsService.page(page, wrapper);
+
+		// 处理员工姓名：收集 employeeId，调用 Feign 获取姓名，并设置到实体中
+		if (result.getRecords() != null && !result.getRecords().isEmpty()) {
+			List<Integer> employeeIdList = result.getRecords().stream()
+					.map(OaEmployeeContractsEntity::getEmployeeId)
+					.filter(Objects::nonNull)
+					.distinct()
+					.collect(Collectors.toList());
+
+			if (!employeeIdList.isEmpty()) {
+				// 转换 Integer 为 Long 以匹配 Feign 接口
+				List<Long> longEmployeeIds = employeeIdList.stream()
+						.map(Integer::longValue)
+						.collect(Collectors.toList());
+				R<Map<Long, String>> nameResponse = oaEmployeeContractsService.getEmployeeNamesByIds(longEmployeeIds);
+				if (nameResponse != null && !nameResponse.getData().isEmpty() && nameResponse.getData() != null) {
+					Map<Long, String> nameMap = nameResponse.getData();
+					result.getRecords().forEach(record -> {
+						if (record.getEmployeeId() != null) {
+							String employeeName = nameMap.get((long) record.getEmployeeId());
+							if (employeeName != null) {
+								record.setEmployeeName(employeeName); // 设置到实体的新字段
+							}
+						}
+					});
+				}
+			}
+		}
+		return R.ok(result);
+}
 
 
     /**

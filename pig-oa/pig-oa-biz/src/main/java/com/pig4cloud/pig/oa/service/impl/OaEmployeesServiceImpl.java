@@ -58,6 +58,32 @@ public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmp
 		}
 		return remoteDeptService.getDeptNamesByIds(deptIds);
 	}
+
+	@Override
+	public R<Map<Long, String>> getEmployeeNamesByIds(List<Long> ids) {
+		// 1. 参数校验
+		if (CollUtil.isEmpty(ids)) {
+			return R.ok(Collections.emptyMap());
+		}
+
+		try {
+			// 2. 查询员工ID和姓名映射（调用自定义 Mapper SQL）
+			Map<Long, String> employeeNameMap = baseMapper.getEmployeeNamesByIds(ids);
+
+			// 3. 如果 Mapper 返回 null，兜底空 Map
+			if (employeeNameMap == null) {
+				employeeNameMap = Collections.emptyMap();
+			}
+
+			// 4. 返回标准封装结果
+			return R.ok(employeeNameMap);
+
+		} catch (Exception e) {
+			log.error("通过员工ID批量查询员工名称失败: {}");
+			return R.failed("查询员工名称失败");
+		}
+	}
+
 	// 完善 getAllDepts() 方法
 	private List<SysDept> getAllDepts() {
 		// 调用远程服务获取部门列表

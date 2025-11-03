@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pig4cloud.pig.common.core.constant.CacheConstants;
+import com.pig4cloud.pig.common.security.annotation.Inner;
 import com.pig4cloud.pig.oa.entity.OaEmployeesEntity;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.common.log.annotation.SysLog;
@@ -17,7 +19,9 @@ import com.pig4cloud.pig.oa.service.OaEmployeesService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import com.pig4cloud.pig.common.security.annotation.HasPermission;
+import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,10 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  * @date 2025-10-12 21:59:38
  */
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RequestMapping("/oaEmployees" )
 @Tag(description = "oaEmployees" , name = "OA员工档案主表管理" )
 @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
@@ -173,21 +174,50 @@ public class OaEmployeesController {
     @Operation(summary = "获取员工列表数据", description = "用于下拉选择，支持姓名和工号模糊搜索")
     @GetMapping("/list")
     public R getEmployeeList(@ParameterObject Page page, @RequestParam(required = false) String keyword) {
-        // 构建查询条件
-        LambdaQueryWrapper<OaEmployeesEntity> queryWrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
-            .select(OaEmployeesEntity::getId, OaEmployeesEntity::getEnpName, OaEmployeesEntity::getEmployeeNo);
+		// 构建查询条件
+		LambdaQueryWrapper<OaEmployeesEntity> queryWrapper = Wrappers.<OaEmployeesEntity>lambdaQuery()
+				.select(OaEmployeesEntity::getId, OaEmployeesEntity::getEnpName, OaEmployeesEntity::getEmployeeNo);
 
-        if (StrUtil.isNotBlank(keyword)) {
-            queryWrapper.and(wrapper -> wrapper
-                .like(OaEmployeesEntity::getEnpName, keyword)
-                .or()
-                .like(OaEmployeesEntity::getEmployeeNo, keyword)
-            );
-        }
-        
-        // 执行分页查询
-        IPage<OaEmployeesEntity> employeePage = oaEmployeesService.page(page, queryWrapper);
-        
-        return R.ok(employeePage);
-    }
+		if (StrUtil.isNotBlank(keyword)) {
+			queryWrapper.and(wrapper -> wrapper
+					.like(OaEmployeesEntity::getEnpName, keyword)
+					.or()
+					.like(OaEmployeesEntity::getEmployeeNo, keyword)
+			);
+		}
+
+		// 执行分页查询
+		IPage<OaEmployeesEntity> employeePage = oaEmployeesService.page(page, queryWrapper);
+
+		return R.ok(employeePage);
+	}
+	/**
+	 * 通过员工ID列表获取员工名称映射
+	 *
+	 * @param idsStr 员工ID列表
+	 * @return 包含员工ID与名称映射关系的结果对象
+	 */
+	// 在 OaEmployeesController 中，修改 getEmployeeNamesByIds 方法（假设这是 pig-upms-biz 服务中的 OaEmployeesController）
+	@Inner
+	@GetMapping("/remote/names/{ids}")
+	@Operation(summary = "通过id获取员工名称(针对feign调用)", description = "通过id获取员工名称(针对feign调用)", hidden = true)
+	@Cacheable(value = CacheConstants.DICT_DETAILS, key = "'employeeNames:' + #ids", unless = "#result.data.isEmpty()")
+	public R<Map<Long, String>> getEmployeeNamesByIds(@PathVariable("ids") String idsStr) {
+		// 参数校验：如果 idsStr 为空，直接返回空 Map
+		if (StrUtil.isBlank(idsStr)) {
+			return R.ok(Collections.emptyMap());
+		}
+
+		// 解析逗号分隔的字符串为 List<Long>
+		List<Long> ids;
+		try {
+			ids = StrUtil.splitTrim(idsStr, ",").stream()
+					.map(s -> Long.parseLong(s))
+					.collect(Collectors.toList());
+		} catch (NumberFormatException e) {
+			return R.failed("Invalid ID format");
+		}
+
+		return oaEmployeesService.getEmployeeNamesByIds(ids);
+	}
 }

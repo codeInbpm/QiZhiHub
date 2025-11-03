@@ -34,6 +34,10 @@ public class OaEmployeeContractsEntity extends Model<OaEmployeeContractsEntity> 
     @Schema(description="关联员工ID")
     private Integer employeeId;
 
+	@Schema(description = "员工姓名")
+	@TableField(exist = false)
+	private String employeeName;
+
 	/**
 	* 合同编号（如“HT-2021-001”），全局唯一
 	*/
