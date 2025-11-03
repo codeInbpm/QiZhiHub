@@ -10,6 +10,7 @@ spring:
       password: @nacos.password@
       discovery:
         server-addr: ${NACOS_HOST:139.224.27.132}:${NACOS_PORT:8858}
+        namespace: brain # 服务注册到brain命名空间
         watch:
           enabled: true
         watch-delay: 1000
