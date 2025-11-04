@@ -135,7 +135,7 @@ public class OaEmployeesController {
     @SysLog("通过id删除OA员工档案主表" )
     @DeleteMapping
     @HasPermission("oa_oaEmployees_del")
-    public R removeById(@RequestBody Integer[] ids) {
+    public R removeById(@RequestBody Long[] ids) {
         return R.ok(oaEmployeesService.removeBatchByIds(CollUtil.toList(ids)));
     }
 

@@ -61,4 +61,9 @@ public interface OaErrorConstants {
 	 * 用户名已存在: 用户名 %s 已存在
 	 */
 	String SYS_USER_USERNAME_EXISTING = "SYS_USER_10001";
+
+	/**
+	 * 入职时间不能为空: 入职时间不能为空
+	 */
+	String ENTRY_DATE_NOT_NULL = "SYS_USER_10008";
 }

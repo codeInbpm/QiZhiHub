@@ -20,4 +20,6 @@ public interface OaEmployeesService extends IService<OaEmployeesEntity> {
 	R<Map<Long, String>> getDeptNamesByIds(List<Long> deptIds);
 
 	R<Map<Long, String>> getEmployeeNamesByIds(List<Long> ids);
+
+	boolean	save(OaEmployeesEntity oaEmployees);
 }

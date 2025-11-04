@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pig4cloud.pig.admin.api.entity.SysDept;
 import com.pig4cloud.pig.admin.api.feign.RemoteDeptService;
 import com.pig4cloud.pig.common.core.constant.CommonConstants;
+import com.pig4cloud.pig.common.core.exception.ValidateCodeException;
 import com.pig4cloud.pig.common.core.util.MsgUtils;
 import com.pig4cloud.pig.common.core.util.R;
 import com.pig4cloud.pig.oa.constant.OaErrorConstants;
@@ -17,12 +18,16 @@ import com.pig4cloud.pig.oa.mapper.OaEmployeesMapper;
 import com.pig4cloud.pig.oa.service.OaEmployeesService;
 import com.pig4cloud.pig.oa.vo.OaEmployeesVO;
 import com.pig4cloud.plugin.excel.vo.ErrorMessage;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +87,37 @@ public class OaEmployeesServiceImpl extends ServiceImpl<OaEmployeesMapper, OaEmp
 			log.error("通过员工ID批量查询员工名称失败: {}");
 			return R.failed("查询员工名称失败");
 		}
+	}
+
+	@Override
+	public boolean save(OaEmployeesEntity oaEmployees) {
+		// 仅保留系统审计字段处理（移除用户校验/默认值）
+		preProcessSystemFields(oaEmployees);
+
+		int result = baseMapper.insert(oaEmployees);
+		return result > 0;
+	}
+
+	/**
+	 *  预处理系统字段
+	 */
+	private void preProcessSystemFields(OaEmployeesEntity entity) {
+		// 通用：设置审计字段（如果未设）
+		if (StringUtils.isBlank(entity.getCreateBy())) {
+			entity.setCreateBy("系统");  // 或从 SecurityContext 获取当前用户
+		}
+		entity.setCreateTime(LocalDateTime.now());
+		entity.setUpdateTime(LocalDateTime.now());
+		entity.setDelFlag("0");  // 默认未删除
+
+		// tenant_id: 若多租户，设当前租户
+		if (StringUtils.isBlank(entity.getTenantId())) {
+			entity.setTenantId("");
+		}
+		if(ObjectUtils.isEmpty(entity.getEntryDate())){
+			throw new ValidateCodeException(MsgUtils.getMessage(OaErrorConstants.ENTRY_DATE_NOT_NULL));
+		}
+		// 其他系统字段如 userId 等，若需默认，可添加
 	}
 
 	// 完善 getAllDepts() 方法
