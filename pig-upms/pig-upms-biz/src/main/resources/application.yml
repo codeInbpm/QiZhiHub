@@ -17,5 +17,8 @@ spring:
     import:
       - nacos:application-@profiles.active@.yml
       - nacos:${spring.application.name}-@profiles.active@.yml
+logging:
+  pattern:
+    level: "[${spring.application.name:},%X{spanId:-}] %5p"
 
 

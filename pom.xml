@@ -168,10 +168,6 @@
 				</exclusions>
 			</dependency>
 
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-starter-sleuth</artifactId>
-			</dependency>
 			<!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-tracing-bridge-brave -->
 			<dependency>
 				<groupId>io.micrometer</groupId>
