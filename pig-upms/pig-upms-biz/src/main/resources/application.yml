@@ -17,8 +17,11 @@ spring:
     import:
       - nacos:application-@profiles.active@.yml
       - nacos:${spring.application.name}-@profiles.active@.yml
+  output:
+    ansi:
+      enabled: ALWAYS
 logging:
   pattern:
-    level: "[${spring.application.name:},%X{spanId:-}] %5p"
+    level: "%clr([${spring.application.name:},%X{spanId:-}]){yellow} %clr(%5p){highlight}"
 
 

@@ -110,12 +110,13 @@ public class RequestLogFilter extends OncePerRequestFilter {
 		}
 		// 获取traceId
 		String traceId = MDC.get("traceId");
-//		if (StrUtil.isBlank(traceId)) {
-//			traceId = UUID.randomUUID().toString().replace("-", "");
-//		}
+		String spanId = MDC.get("spanId");
 		reqLog.append(" 【请求头】  {}: {}\n");
 		reqArgs.add("traceId");
 		reqArgs.add(traceId);
+		reqLog.append(" 【请求头】  {}: {}\n");
+		reqArgs.add("spanId");
+		reqArgs.add(spanId);
 
 		reqLog.append("====================  请求结束  ====================\n");
 
